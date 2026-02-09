@@ -1,0 +1,53 @@
+------------------
+Time: 2025-09-24 10:53:26
+Provider ID from session: 1
+Request ID from POST: 1
+Success: Job accepted.
+------------------
+Time: 2025-09-28 16:24:06
+Provider ID from session: 1
+Request ID from POST: 31
+Success: Job accepted.
+------------------
+Time: 2025-09-28 19:01:16
+Error: Unauthorized - user_id not in session
+------------------
+Time: 2025-09-28 19:01:31
+Provider ID from session: 1
+Request ID from POST: 32
+Success: Job accepted.
+------------------
+Time: 2025-09-28 19:29:02
+Provider ID from session: 1
+Request ID from POST: 33
+Success: Job accepted.
+------------------
+Time: 2025-09-28 19:37:09
+Provider ID from session: 1
+Request ID from POST: 34
+Success: Job accepted.
+------------------
+Time: 2025-09-28 20:02:58
+Provider ID from session: 1
+Request ID from POST: 35
+Success: Job accepted.
+------------------
+Time: 2025-09-28 20:22:00
+Provider ID from session: 1
+Request ID from POST: 36
+Success: Job accepted.
+------------------
+Time: 2025-09-28 20:46:29
+Provider ID from session: 3
+Request ID from POST: 37
+Success: Job accepted.
+------------------
+Time: 2025-09-29 07:02:12
+Provider ID from session: 1
+Request ID from POST: 38
+Success: Job accepted.
+------------------
+Time: 2025-09-29 07:09:12
+Provider ID from session: 1
+Request ID from POST: 39
+Success: Job accepted.
