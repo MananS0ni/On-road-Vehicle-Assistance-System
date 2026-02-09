@@ -1,0 +1,378 @@
+:root {
+    --primary-color: #4f46e5;
+    --secondary-color: #7c3aed;
+    --background-color: #f0f4f8;
+    --form-bg-color: #ffffff;
+    --text-color: #333;
+    --input-border-color: #ddd;
+    --button-text-color: #fff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding: 20px;
+}
+
+.container {
+    position: relative;
+    width: 100%;
+    max-width: 850px;
+    min-height: 600px;
+    background: var(--form-bg-color);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-outer-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 50%;
+    transition: all 0.6s ease-in-out;
+}
+
+.form-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 0 40px;
+    text-align: center;
+}
+
+.sign-up-container .form-container {
+    justify-content: flex-start;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    overflow-y: auto;
+}
+
+/* Custom Scrollbar */
+.sign-up-container .form-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sign-up-container .form-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sign-up-container .form-container::-webkit-scrollbar-thumb {
+    background: var(--input-border-color);
+    border-radius: 10px;
+}
+
+.sign-up-container .form-container::-webkit-scrollbar-thumb:hover {
+    background: #b3b3b3;
+}
+
+
+.form-container h1 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.form-container input,
+.form-container select {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 8px 0;
+    border: 1px solid var(--input-border-color);
+    border-radius: 5px;
+    background: #f7f7f7;
+    outline: none;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.form-container form {
+    width: 100%;
+}
+
+.form-container button {
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    color: var(--button-text-color);
+    font-size: 14px;
+    padding: 12px 45px;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: transform 80ms ease-in;
+}
+
+.form-container button:active {
+    transform: scale(0.95);
+}
+
+.sign-up-container {
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+}
+
+.sign-in-container {
+    left: 0;
+    width: 50%;
+    z-index: 2;
+}
+
+.overlay-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.6s ease-in-out;
+    z-index: 100;
+}
+
+.overlay {
+    background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+    color: #fff;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+.overlay-panel {
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 40px;
+    height: 100%;
+    width: 50%;
+    text-align: center;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+.overlay-left {
+    transform: translateX(-20%);
+}
+
+.overlay-right {
+    right: 0;
+    transform: translateX(0);
+}
+
+.overlay h1 {
+    font-weight: 600;
+    margin: 0;
+}
+
+.overlay p {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+    margin: 20px 0 30px;
+}
+
+.overlay button {
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    color: var(--button-text-color);
+    font-size: 14px;
+    padding: 12px 45px;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: transform 80ms ease-in;
+}
+
+.overlay button:active {
+    transform: scale(0.95);
+}
+
+.role-selection {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.role-selection label {
+    font-weight: 500;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.role-options {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.role-options input[type="radio"] {
+    display: none;
+}
+
+.role-options .option {
+    flex: 1;
+    padding: 8px;
+    border: 2px solid var(--input-border-color);
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.role-options input[type="radio"]:checked+.option {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.dynamic-fields {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out;
+}
+
+/* Animation */
+.container.right-panel-active .sign-in-container {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.container.right-panel-active .sign-up-container {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+    animation: show 0.6s;
+}
+
+@keyframes show {
+
+    0%,
+    49.99% {
+        opacity: 0;
+        z-index: 1;
+    }
+
+    50%,
+    100% {
+        opacity: 1;
+        z-index: 5;
+    }
+}
+
+.container.right-panel-active .overlay-container {
+    transform: translateX(-100%);
+}
+
+.container.right-panel-active .overlay {
+    transform: translateX(50%);
+}
+
+.container.right-panel-active .overlay-left {
+    transform: translateX(0);
+}
+
+.container.right-panel-active .overlay-right {
+    transform: translateX(20%);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        min-height: 800px;
+    }
+
+    .form-outer-container {
+        width: 100%;
+    }
+
+    .sign-in-container {
+        top: 0;
+        height: 50%;
+    }
+
+    .sign-up-container {
+        top: 0;
+        height: 50%;
+    }
+
+    .overlay-container {
+        left: 0;
+        top: 50%;
+        width: 100%;
+        height: 50%;
+    }
+
+    .overlay {
+        left: 0;
+        width: 100%;
+        height: 200%;
+        transform: translateY(0);
+    }
+
+    .overlay-panel {
+        width: 100%;
+        height: 50%;
+    }
+
+    .overlay-right {
+        top: 0;
+        transform: translateY(0);
+    }
+
+    .overlay-left {
+        bottom: 0;
+        transform: translateY(-100%);
+    }
+
+    .container.right-panel-active .sign-in-container {
+        transform: translateY(100%);
+    }
+
+    .container.right-panel-active .sign-up-container {
+        transform: translateY(100%);
+    }
+
+    .container.right-panel-active .overlay-container {
+        transform: translateY(-100%);
+    }
+
+    .container.right-panel-active .overlay {
+        transform: translateY(50%);
+    }
+
+    .container.right-panel-active .overlay-left {
+        transform: translateY(0);
+    }
+
+    .container.right-panel-active .overlay-right {
+        transform: translateY(20%);
+    }
+}

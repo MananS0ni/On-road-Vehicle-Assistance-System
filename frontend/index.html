@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Service Platform - Login & Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container" id="container">
+        <div class="form-outer-container sign-up-container">
+            <div class="form-container">
+                <form id="signUpForm">
+                    <h1>Create Account</h1>
+
+                    <div class="role-selection">
+                        <label>Register as:</label>
+                        <div class="role-options">
+                            <input type="radio" id="vehicle-owner" name="role" value="vehicle-owner" checked>
+                            <label for="vehicle-owner" class="option">Vehicle Owner</label>
+
+                            <input type="radio" id="service-provider" name="role" value="service-provider">
+                            <label for="service-provider" class="option">Service Provider</label>
+
+                            <input type="radio" id="admin" name="role" value="admin">
+                            <label for="admin" class="option">Admin</label>
+                        </div>
+                    </div>
+
+                    <button type="button" id="continueBtn">CONTINUE</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="form-outer-container sign-in-container">
+            <div class="form-container">
+                <form id="signInForm" action="../backend/login.php" method="POST">
+                    <h1>Welcome Back!</h1>
+                    <p>To keep connected with us please login with your personal info</p>
+                    <input type="email" name="email" placeholder="Email" required />
+                    <input type="password" name="password" placeholder="Password" required />
+                    <button type="submit">SIGN IN</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Welcome Back!</h1>
+                    <p>To keep connected with us please login with your personal info</p>
+                    <button class="ghost" id="signIn">SIGN IN</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Hello, Friend!</h1>
+                    <p>Enter your personal details and start journey with us</p>
+                    <button class="ghost" id="signUp">SIGN UP</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const signUpButton = document.getElementById('signUp');
+        const signInButton = document.getElementById('signIn');
+        const container = document.getElementById('container');
+        const continueBtn = document.getElementById('continueBtn');
+
+        signUpButton.addEventListener('click', () => {
+            container.classList.add("right-panel-active");
+        });
+
+        signInButton.addEventListener('click', () => {
+            container.classList.remove("right-panel-active");
+        });
+
+        // Handle role selection - FIXED VERSION
+        document.querySelectorAll('.role-options .option').forEach(option => {
+            option.addEventListener('click', function () {
+                // Remove active class from all options
+                document.querySelectorAll('.role-options .option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+
+                // Add active class to clicked option
+                this.classList.add('active');
+
+                // Get the corresponding radio button ID from the 'for' attribute
+                const radioId = this.getAttribute('for');
+                const radioButton = document.getElementById(radioId);
+
+                // Uncheck all radio buttons first
+                document.querySelectorAll('input[name="role"]').forEach(radio => {
+                    radio.checked = false;
+                });
+
+                // Check the selected radio button
+                if (radioButton) {
+                    radioButton.checked = true;
+                }
+
+                console.log('Selected role:', radioButton.value); // Debug log
+            });
+        });
+
+        // Handle continue button click - FIXED VERSION
+        continueBtn.addEventListener('click', function () {
+            // Get the currently checked radio button
+            const selectedRadio = document.querySelector('input[name="role"]:checked');
+
+            if (selectedRadio) {
+                console.log('Redirecting to:', selectedRadio.value); // Debug log
+                redirectToRole(selectedRadio.value);
+            } else {
+                alert('Please select a role');
+            }
+        });
+
+        // Role redirection function
+        function redirectToRole(role) {
+            console.log('Redirecting to role:', role); // Debug log
+
+            switch (role) {
+                case 'vehicle-owner':
+                    window.location.href = 'vehicle-owner-signup.html';
+                    break;
+                case 'service-provider':
+                    window.location.href = 'service-provider-signup.html';
+                    break;
+                case 'admin':
+                    window.location.href = 'admin-signup.html';
+                    break;
+                default:
+                    alert('Invalid role selected: ' + role);
+            }
+        }
+
+
+
+        // Set initial active state
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set the first option as active by default
+            const firstOption = document.querySelector('.role-options .option[for="vehicle-owner"]');
+            if (firstOption) {
+                firstOption.classList.add('active');
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Owner Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-outer-container sign-up-container" style="opacity: 1; z-index: 5; left: 0; width: 50%;">
+            <div class="form-container">
+                <form id="vehicleOwnerForm" action="../backend/register_vehicle_owner.php" method="POST">
+                    <h1>Vehicle Owner Registration</h1>
+
+                    <input type="text" name="name" placeholder="Full Name" required />
+                    <input type="email" name="email" placeholder="Email" required />
+                    <input type="password" name="password" placeholder="Password" required />
+                    <input type="tel" name="phone" placeholder="Phone Number" required />
+
+                    <select name="vehicleType" required>
+                        <option value="">Select Vehicle Type</option>
+                        <option value="car">Car</option>
+                        <option value="bike">Bike</option>
+                        <option value="truck">Truck</option>
+                        <option value="bus">Bus</option>
+                    </select>
+
+                    <input type="text" name="vehicleBrand" placeholder="Vehicle Brand" required />
+                    <input type="text" name="vehicleModel" placeholder="Vehicle Model" required />
+                    <input type="text" name="vehicleReg" placeholder="Vehicle Registration Number" required />
+
+                    <select name="FuelType" required>
+                        <option value="">Select Fuel Type</option>
+                        <option value="petrol">Petrol</option>
+                        <option value="diesel">Diesel</option>
+                        <option value="electric">Electric</option>
+                        <option value="hybrid">Hybrid</option>
+                    </select>
+
+                    <button type="submit">Create Account</button>
+
+                    <p style="margin-top: 15px; font-size: 14px;">
+                        <a href="index.html" style="color: var(--primary-color); text-decoration: none;">← Back to Role
+                            Selection</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-right">
+                    <h1>Vehicle Owner Benefits</h1>
+                    <p>• Book services instantly</p>
+                    <p>• Track service history</p>
+                    <p>• Get maintenance reminders</p>
+                    <p>• Rate service providers</p>
+                    <p>• 24/7 emergency support</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>

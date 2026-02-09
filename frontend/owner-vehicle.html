@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Vehicles - On-Road Assist</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #f8fafc;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+            --success-color: #16a34a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-dark);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 280px;
+            background-color: var(--white);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo-icon { font-size: 1.5rem; }
+        .logo h2 { font-size: 1.1rem; font-weight: 700; }
+
+        .nav-menu {
+            list-style: none;
+            padding: 1rem 0;
+            flex: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .nav-link i { width: 20px; text-align: center; }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background-color: var(--secondary-color);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: var(--white);
+        }
+
+        .vehicles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .vehicle-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .vehicle-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .vehicle-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .vehicle-details p {
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .vehicle-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border-radius: 4px;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .no-vehicles {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: var(--white);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+
+        .btn-secondary {
+            background: var(--text-light);
+            color: var(--white);
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">
+            <span class="logo-icon">🚗</span>
+            <h2>On-Road Assist</h2>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard-vehicle-owner.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="my-vehicles.html" class="nav-link active">
+                    <i class="fas fa-car"></i>
+                    My Vehicles
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="service-requests.html" class="nav-link">
+                    <i class="fas fa-tools"></i>
+                    Service Requests
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="service-history.html" class="nav-link">
+                    <i class="fas fa-history"></i>
+                    Service History
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="profile.html" class="nav-link">
+                    <i class="fas fa-user"></i>
+                    Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../backend/logout.php" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <div class="header">
+            <h1><i class="fas fa-car"></i> My Vehicles</h1>
+            <div style="display: flex; gap: 1rem;">
+                <button onclick="showAddVehicleModal()" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Add Vehicle
+                </button>
+                <a href="dashboard-vehicle-owner.html" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
+
+        <div class="vehicles-grid">
+            <!-- Sample Vehicle Cards -->
+            <div class="vehicle-card">
+                <div class="vehicle-header">
+                    <div class="vehicle-name">Toyota Innova</div>
+                </div>
+                <div class="vehicle-details">
+                    <p><i class="fas fa-id-card"></i> <strong>Plate:</strong> KA01AB1234</p>
+                    <p><i class="fas fa-car-side"></i> <strong>Type:</strong> SUV</p>
+                    <p><i class="fas fa-calendar"></i> <strong>Year:</strong> 2020</p>
+                    <p><i class="fas fa-gas-pump"></i> <strong>Fuel:</strong> Diesel</p>
+                </div>
+                <div class="vehicle-actions">
+                    <button class="btn btn-small btn-warning">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-small btn-danger">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                    <button class="btn btn-small btn-success">
+                        <i class="fas fa-tools"></i> Request Service
+                    </button>
+                </div>
+            </div>
+
+            <div class="vehicle-card">
+                <div class="vehicle-header">
+                    <div class="vehicle-name">Honda City</div>
+                </div>
+                <div class="vehicle-details">
+                    <p><i class="fas fa-id-card"></i> <strong>Plate:</strong> KA02CD5678</p>
+                    <p><i class="fas fa-car-side"></i> <strong>Type:</strong> Sedan</p>
+                    <p><i class="fas fa-calendar"></i> <strong>Year:</strong> 2019</p>
+                    <p><i class="fas fa-gas-pump"></i> <strong>Fuel:</strong> Petrol</p>
+                </div>
+                <div class="vehicle-actions">
+                    <button class="btn btn-small btn-warning">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-small btn-danger">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                    <button class="btn btn-small btn-success">
+                        <i class="fas fa-tools"></i> Request Service
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Vehicle Modal -->
+    <div id="addVehicleModal" class="modal">
+        <div class="modal-content">
+            <h2><i class="fas fa-plus"></i> Add New Vehicle</h2>
+            <form id="vehicleForm">
+                <div class="form-group">
+                    <label for="vehicleType">Vehicle Type</label>
+                    <select id="vehicleType" class="form-input" required>
+                        <option value="">Select Type</option>
+                        <option value="Car">Car</option>
+                        <option value="SUV">SUV</option>
+                        <option value="Bike">Bike</option>
+                        <option value="Truck">Truck</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="vehicleBrand">Vehicle Brand</label>
+                    <input type="text" id="vehicleBrand" class="form-input" placeholder="e.g., Toyota" required>
+                </div>
+                <div class="form-group">
+                    <label for="vehicleModel">Vehicle Model</label>
+                    <input type="text" id="vehicleModel" class="form-input" placeholder="e.g., Innova" required>
+                </div>
+                <div class="form-group">
+                    <label for="numberPlate">Number Plate</label>
+                    <input type="text" id="numberPlate" class="form-input" placeholder="e.g., KA01AB1234" required>
+                </div>
+                <div class="form-group">
+                    <label for="vehicleYear">Year</label>
+                    <input type="number" id="vehicleYear" class="form-input" min="1990" max="2025">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-success">Add Vehicle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showAddVehicleModal() {
+            document.getElementById('addVehicleModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('addVehicleModal').style.display = 'none';
+        }
+
+        document.getElementById('vehicleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Vehicle added successfully!');
+            closeModal();
+        });
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('addVehicleModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

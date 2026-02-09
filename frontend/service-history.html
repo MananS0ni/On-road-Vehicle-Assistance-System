@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service History - On-Road Assist</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #f8fafc;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-dark);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 280px;
+            background-color: var(--white);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo-icon { font-size: 1.5rem; }
+        .logo h2 { font-size: 1.1rem; font-weight: 700; }
+
+        .nav-menu {
+            list-style: none;
+            padding: 1rem 0;
+            flex: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .nav-link i { width: 20px; text-align: center; }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background-color: var(--secondary-color);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .stats-overview {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .stat-item h3 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-item p {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .filter-section {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .filter-select {
+            padding: 0.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            min-width: 150px;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .service-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .service-type {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .service-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-completed { background: #dcfce7; color: #166534; }
+
+        .service-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .service-details p {
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .service-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border-radius: 4px;
+        }
+
+        .btn-info {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+
+        .rating-stars {
+            color: #fbbf24;
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">
+            <span class="logo-icon">🚗</span>
+            <h2>On-Road Assist</h2>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard-vehicle-owner.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="my-vehicles.html" class="nav-link">
+                    <i class="fas fa-car"></i>
+                    My Vehicles
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="service-requests.html" class="nav-link">
+                    <i class="fas fa-tools"></i>
+                    Service Requests
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="service-history.html" class="nav-link active">
+                    <i class="fas fa-history"></i>
+                    Service History
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="profile.html" class="nav-link">
+                    <i class="fas fa-user"></i>
+                    Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../backend/logout.php" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <div class="header">
+            <h1><i class="fas fa-history"></i> Service History</h1>
+            <a href="dashboard-vehicle-owner.html" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+
+        <div class="stats-overview">
+            <h3 style="margin-bottom: 1rem;"><i class="fas fa-chart-bar"></i> Service Overview</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3>15</h3>
+                    <p>Total Services</p>
+                </div>
+                <div class="stat-item">
+                    <h3>12</h3>
+                    <p>Completed</p>
+                </div>
+                <div class="stat-item">
+                    <h3>1</h3>
+                    <p>In Progress</p>
+                </div>
+                <div class="stat-item">
+                    <h3>₹18,500</h3>
+                    <p>Total Spent</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <div class="filter-group">
+                <label>Status</label>
+                <select class="filter-select">
+                    <option value="all">All Status</option>
+                    <option value="completed">Completed</option>
+                    <option value="in_progress">In Progress</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Service Type</label>
+                <select class="filter-select">
+                    <option value="all">All Types</option>
+                    <option value="towing">Towing</option>
+                    <option value="battery">Battery Jump</option>
+                    <option value="tire">Tire Change</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Time Period</label>
+                <select class="filter-select">
+                    <option value="all">All Time</option>
+                    <option value="last_week">Last Week</option>
+                    <option value="last_month">Last Month</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="history-list">
+            <!-- Service History Items -->
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-type">Battery Jump Service</div>
+                    <div class="service-status status-completed">COMPLETED</div>
+                </div>
+                <div class="service-details">
+                    <p><i class="fas fa-user"></i> <strong>Provider:</strong> Quick Fix Auto</p>
+                    <p><i class="fas fa-star rating-stars"></i> <strong>Rating:</strong> 4.8 ★★★★★</p>
+                    <p><i class="fas fa-car"></i> <strong>Vehicle:</strong> Toyota Innova</p>
+                    <p><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> MG Road</p>
+                    <p><i class="fas fa-clock"></i> <strong>Date:</strong> Sep 20, 2025</p>
+                    <p><i class="fas fa-hourglass-half"></i> <strong>Duration:</strong> 45 minutes</p>
+                    <p><i class="fas fa-rupee-sign"></i> <strong>Cost:</strong> ₹500</p>
+                </div>
+                <div class="service-actions">
+                    <button class="btn btn-small btn-info">
+                        <i class="fas fa-file-invoice"></i> View Invoice
+                    </button>
+                    <button class="btn btn-small btn-success">
+                        <i class="fas fa-redo"></i> Book Again
+                    </button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-type">Towing Service</div>
+                    <div class="service-status status-completed">COMPLETED</div>
+                </div>
+                <div class="service-details">
+                    <p><i class="fas fa-user"></i> <strong>Provider:</strong> Road Rescue</p>
+                    <p><i class="fas fa-star rating-stars"></i> <strong>Rating:</strong> 4.5 ★★★★☆</p>
+                    <p><i class="fas fa-car"></i> <strong>Vehicle:</strong> Honda City</p>
+                    <p><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> Electronic City</p>
+                    <p><i class="fas fa-clock"></i> <strong>Date:</strong> Sep 15, 2025</p>
+                    <p><i class="fas fa-hourglass-half"></i> <strong>Duration:</strong> 2 hours</p>
+                    <p><i class="fas fa-rupee-sign"></i> <strong>Cost:</strong> ₹2,000</p>
+                </div>
+                <div class="service-actions">
+                    <button class="btn btn-small btn-info">
+                        <i class="fas fa-file-invoice"></i> View Invoice
+                    </button>
+                    <button class="btn btn-small btn-success">
+                        <i class="fas fa-redo"></i> Book Again
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

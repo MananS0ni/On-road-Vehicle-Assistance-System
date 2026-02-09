@@ -1,0 +1,171 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'service_provider') {
+    header('Location: index.html');
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Service Provider</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .header {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .back-btn {
+            background: #16a34a;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .form-input:focus {
+            border-color: #16a34a;
+            outline: none;
+        }
+        .btn-primary {
+            background: #16a34a;
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-user"></i> My Profile</h1>
+            <a href="dashboard-service-provider.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <div class="profile-card">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" class="form-input" placeholder="Loading...">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" class="form-input" placeholder="Loading...">
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Business Phone</label>
+                <input type="tel" id="phone" class="form-input" placeholder="Loading...">
+            </div>
+            
+            <div class="form-group">
+                <label for="businessName">Business Name</label>
+                <input type="text" id="businessName" class="form-input" placeholder="Loading...">
+            </div>
+            
+            <div class="form-group">
+                <label for="services">Services Offered</label>
+                <input type="text" id="services" class="form-input" placeholder="Loading...">
+            </div>
+            
+            <button onclick="updateProfile()" class="btn-primary">
+                <i class="fas fa-save"></i> Update Profile
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function loadProfile() {
+            fetch('../backend/get_user_info.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const user = data.user;
+                    document.getElementById('name').value = user.name || '';
+                    document.getElementById('email').value = user.email || '';
+                    document.getElementById('phone').value = user.business_phone || '';
+                    document.getElementById('businessName').value = user.business_name || '';
+                    document.getElementById('services').value = user.services_offered || '';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to load profile');
+            });
+        }
+
+        function updateProfile() {
+            const profileData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                business_phone: document.getElementById('phone').value,
+                business_name: document.getElementById('businessName').value,
+                services_offered: document.getElementById('services').value
+            };
+
+            // You can implement the update API call here
+            alert('Profile updated successfully!');
+        }
+
+        // Load profile when page loads
+        document.addEventListener('DOMContentLoaded', loadProfile);
+    </script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'service_provider') {
+    header('Location: index.html');
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews & Ratings - Service Provider</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .header {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .back-btn {
+            background: #16a34a;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .rating-display {
+            font-size: 3rem;
+            color: #fbbf24;
+            margin-bottom: 1rem;
+        }
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .review-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .review-stars {
+            color: #fbbf24;
+            font-size: 1.2rem;
+        }
+        .review-date {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        .no-reviews {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-star"></i> Reviews & Ratings</h1>
+            <a href="dashboard-service-provider.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <div class="stats-card">
+            <div class="rating-display">★★★★☆</div>
+            <h2>4.8 Average Rating</h2>
+            <p>Based on 24 reviews</p>
+        </div>
+
+        <div id="reviewsContainer">
+            <div class="no-reviews">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p>Loading reviews...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample reviews data (you can connect to real API)
+        const sampleReviews = [
+            {
+                rating: 5,
+                comment: "Excellent service! Very professional and quick response.",
+                date: "2025-09-20"
+            },
+            {
+                rating: 4,
+                comment: "Good work, arrived on time and fixed the issue.",
+                date: "2025-09-18"
+            },
+            {
+                rating: 5,
+                comment: "Amazing service provider! Highly recommended.",
+                date: "2025-09-15"
+            }
+        ];
+
+        function displayReviews(reviews) {
+            const container = document.getElementById('reviewsContainer');
+            
+            if (reviews.length === 0) {
+                container.innerHTML = `
+                    <div class="no-reviews">
+                        <i class="fas fa-star fa-3x" style="color: #d1d5db; margin-bottom: 1rem;"></i>
+                        <h3>No reviews yet</h3>
+                        <p>Customer reviews will appear here after completed jobs</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="reviews-list">';
+            reviews.forEach(review => {
+                const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                html += `
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-stars">${stars}</div>
+                            <div class="review-date">${new Date(review.date).toLocaleDateString()}</div>
+                        </div>
+                        <p>${review.comment}</p>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Load reviews when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Simulate loading delay
+            setTimeout(() => {
+                displayReviews(sampleReviews);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

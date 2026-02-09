@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Provider Dashboard - On-Road Assist</title>
+    
+    <!-- Leaflet.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Original styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+:root {
+    --primary-color: #16a34a;
+    --primary-hover: #15803d;
+    --secondary-color: #f8fafc;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --white: #ffffff;
+    --border-color: #e5e7eb;
+    --danger-color: #dc2626;
+    --warning-color: #f59e0b;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--secondary-color);
+    color: var(--text-dark);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* SIDEBAR STYLES */
+.sidebar {
+    width: 280px;
+    background-color: var(--white);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-color);
+    z-index: 1000;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 2rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.logo-icon {
+    font-size: 1.75rem;
+    color: var(--primary-color);
+}
+
+.logo h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.nav-menu {
+    list-style: none;
+    padding: 1rem 0;
+    flex: 1;
+}
+
+.nav-item {
+    margin-bottom: 0.25rem;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    color: var(--text-light);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.nav-link i {
+    width: 20px;
+    text-align: center;
+}
+
+/* MAIN CONTENT STYLES */
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    background-color: var(--secondary-color);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-weight: 500;
+}
+
+.online-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--danger-color);
+}
+
+.status-dot.online {
+    background-color: var(--primary-color);
+}
+
+/* STATS GRID */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background-color: var(--white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.stat-card h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.stat-card p {
+    color: var(--text-light);
+    font-size: 0.875rem;
+}
+
+/* CARD STYLES */
+.card {
+    background-color: var(--white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* STATUS BAR */
+.status-bar {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.status-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.status-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    background-color: rgba(255,255,255,0.2);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.875rem;
+}
+
+.status-btn:hover {
+    background-color: rgba(255,255,255,0.3);
+}
+
+.status-btn.active {
+    background-color: white;
+    color: var(--primary-color);
+}
+
+/* BUTTON STYLES */
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: var(--white);
+}
+
+.btn-danger:hover {
+    background-color: #b91c1c;
+}
+
+/* MAP CONTAINER */
+.map-container {
+    height: 400px;
+    border-radius: 8px;
+    margin-top: 1rem;
+    border: 1px solid var(--border-color);
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+}
+
+/* REQUEST CARDS */
+.request-card {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: var(--white);
+}
+
+.offline-message {
+    text-align: center;
+    color: var(--text-light);
+    font-style: italic;
+    padding: 2rem;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+    }
+    
+    .main-content {
+        padding: 1rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+}
+</style>
+
+</head>
+<body>
+   <nav class="sidebar">
+    <div class="logo">
+        <span class="logo-icon">🔧</span>
+        <h2>On-Road Assist</h2>
+    </div>
+    
+    <ul class="nav-menu">
+        <li class="nav-item">
+            <a href="dashboard-service-provider.html" class="nav-link active">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="provider-jobs.html" class="nav-link">
+                <i class="fas fa-briefcase"></i>
+                My Jobs
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="provider-reviews.html" class="nav-link">
+                <i class="fas fa-star"></i>
+                Reviews
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="provider-profile.html" class="nav-link">
+                <i class="fas fa-user"></i>
+                Profile
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="../backend/logout.php" class="nav-link">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+        </li>
+    </ul>
+</nav>
+
+
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <h1 id="welcomeMessage">Service Provider Dashboard</h1>
+            <div class="user-profile">
+                <div class="user-avatar" id="userAvatar">?</div>
+                <div>
+                    <span id="userName">Loading...</span>
+                    <div class="online-status">
+                        <span class="status-dot" id="statusDot"></span>
+                        <span id="statusText">Offline</span>
+                        <button class="btn btn-primary" onclick="toggleOnlineStatus()" id="toggleBtn">Go Online</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<!-- Statistics Section - UPDATED without earnings -->
+<div class="stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Average Rating Card -->
+    <div class="stats-card" style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h3 style="color: #16a34a; font-size: 2.5rem; margin: 0;" id="averageRating">0.0</h3>
+        <p style="color: #6b7280; margin: 0.5rem 0 0 0;">Average Rating</p>
+    </div>
+
+    <!-- Jobs Completed Today Card -->  
+    <div class="stats-card" style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h3 style="color: #16a34a; font-size: 2.5rem; margin: 0;" id="jobsCompleted">0</h3>
+        <p style="color: #6b7280; margin: 0.5rem 0 0 0;">Jobs Completed Today</p>
+    </div>
+</div>
+
+
+        <!-- Incoming Requests Section -->
+        <div class="card">
+            <h3><i class="fas fa-bell"></i> Incoming Job Requests</h3>
+            <div id="requestsContainer">
+                <div class="offline-message" id="offlineMessage">
+                    <p>You are offline. Go online to receive new job requests.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Update Bar -->
+        <div class="card status-bar">
+            <h3><i class="fas fa-tasks"></i> Current Job Status</h3>
+            <div id="currentJobInfo">
+                <p>Current Job: <span id="jobType">No active job</span></p>
+                <p>Customer: <span id="customerName">-</span></p>
+                <p>Location: <span id="jobLocation">-</span></p>
+                <p>Phone: <span id="customerPhone">-</span></p>
+            </div>
+            
+            <div class="status-buttons">
+                <button class="status-btn" onclick="updateJobStatus('accepted')">Accept Job</button>
+                <button class="status-btn" onclick="updateJobStatus('en_route')">En Route</button>
+                <button class="status-btn" onclick="updateJobStatus('arrived')">Arrived</button>
+                <button class="status-btn" onclick="updateJobStatus('in_progress')">Working</button>
+                <button class="status-btn" onclick="updateJobStatus('completed')">Completed</button>
+            </div>
+        </div>
+
+        <!-- Navigation & Tracking -->
+        <div class="card">
+            <h3><i class="fas fa-map-marker-alt"></i> Navigation & Live Tracking</h3>
+            <div class="map-container" id="providerMap"></div>
+            <button class="btn btn-primary" onclick="updateMyLocation()" style="margin-top: 1rem;">
+                <i class="fas fa-location-arrow"></i> Update My Location
+            </button>
+        </div>
+    </main>
+
+    <!-- Leaflet.js JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+   <script>
+        let map;
+        let providerMarker;
+        let customerMarker;
+        let currentJob = null;
+        let currentUser = null;
+        let isOnline = false;
+        
+        // Load user information on page load
+        function loadUserInfo() {
+            fetch('../backend/get_user_info.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentUser = data.user;
+                    updateUserInterface(data.user);
+                } else {
+                    console.error('Error loading user info:', data.error);
+                    // Set defaults if error
+                    document.getElementById('userName').textContent = 'Provider';
+                    document.getElementById('userAvatar').textContent = 'P';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching user info:', error);
+                document.getElementById('userName').textContent = 'Provider';
+                document.getElementById('userAvatar').textContent = 'P';
+            });
+        }
+
+        // Update user interface with real data
+        function updateUserInterface(user) {
+            // Update header
+            document.getElementById('welcomeMessage').textContent = `Service Provider Dashboard`;
+            document.getElementById('userName').textContent = user.name;
+            
+            // Update user avatar with initials
+            const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.getElementById('userAvatar').textContent = initials;
+        }
+
+        function initializeProviderMap() {
+            map = L.map('providerMap').setView([23.0225, 72.5714], 13);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Start location tracking
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    if (providerMarker) {
+                        providerMarker.setLatLng([lat, lng]);
+                    } else {
+                        const providerIcon = L.divIcon({
+                            className: 'custom-marker',
+                            html: '<i class="fas fa-tools" style="color: #16a34a; font-size: 20px;"></i>',
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 15]
+                        });
+                        providerMarker = L.marker([lat, lng], {icon: providerIcon})
+                            .addTo(map)
+                            .bindPopup('Your Location');
+                    }
+                }, function(error) {
+                    console.error('Geolocation error:', error);
+                }, {enableHighAccuracy: true, timeout: 10000, maximumAge: 60000});
+            }
+        }
+
+        // Load pending requests
+        function loadPendingRequests() {
+            fetch('../backend/get_pending_requests.php')
+            .then(response => response.json())
+            .then(requests => {
+                displayPendingRequests(requests);
+            })
+            .catch(error => {
+                console.error('Error loading requests:', error);
+            });
+        }
+
+        // Display pending requests
+        function displayPendingRequests(requests) {
+            const container = document.getElementById('requestsContainer');
+            const offlineMessage = document.getElementById('offlineMessage');
+            
+            if (!isOnline) {
+                offlineMessage.innerHTML = '<p>You are offline. Go online to receive new job requests.</p>';
+                return;
+            }
+
+            if (requests.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No pending requests at the moment.</p>';
+                return;
+            }
+
+            const requestsHTML = requests.map(request => `
+                <div class="request-card" style="border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; background: white;">
+                    <div style="display: flex; justify-content: between; align-items: center;">
+                        <div style="flex: 1;">
+                            <h4 style="color: #16a34a; margin-bottom: 0.5rem;">🚗 ${request.service_type}</h4>
+                            <p><strong>Customer:</strong> ${request.customer_name}</p>
+                            <p><strong>Vehicle:</strong> ${request.vehicle_brand} ${request.vehicle_model} (${request.number_plate})</p>
+                            <p><strong>Location:</strong> ${request.location}</p>
+                            <p><strong>Phone:</strong> ${request.phone_number}</p>
+                            <p><strong>Time:</strong> ${new Date(request.request_time).toLocaleString()}</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary" onclick="acceptJob(${request.request_id})" 
+                                    style="background: #16a34a; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;">
+                                Accept Job
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = requestsHTML;
+        }
+
+        // Accept a job
+        function acceptJob(requestId) {
+            if (!confirm('Are you sure you want to accept this job?')) {
+                return;
+            }
+
+            fetch('../backend/accept_job.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    request_id: requestId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Job accepted successfully!', 'success');
+                    loadPendingRequests(); // Refresh the list
+                    loadCurrentJob(); // Load current job info
+                    loadStats();
+                } else {
+                    showNotification('Error accepting job: ' + (data.error || 'Unknown error'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error accepting job', 'error');
+            });
+        }
+
+       async function loadStats() {
+    try {
+        // Load average rating
+        const ratingRes = await fetch('../backend/get_provider_rating.php');
+        const ratings = await ratingRes.json();
+        let total = 0;
+        let count = ratings.length;
+        ratings.forEach(r => total += parseFloat(r.rating || 0));
+        const average = count > 0 ? (total / count).toFixed(1) : '0.0';
+        document.getElementById('averageRating').textContent = average;
+
+        // Load jobs completed today
+        const jobsRes = await fetch('../backend/get_provider_jobs_today.php');
+        const jobs = await jobsRes.json();
+        document.getElementById('jobsCompleted').textContent = jobs.jobs_today;
+    } catch (error) {
+        console.error('Error loading stats:', error);
+        document.getElementById('averageRating').textContent = '0.0';
+        document.getElementById('jobsCompleted').textContent = '0';
+    }
+}
+
+       function updateJobStatus(status) {
+    if (!currentJob) {
+        showNotification('No active job to update', 'error');
+        return;
+    }
+    
+    // Update status in database
+    fetch('../backend/update_job_status.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            job_id: currentJob.request_id,
+            status: status,
+            message: `Status updated to ${status}`
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Status updated successfully to: ' + status, 'success');
+            highlightActiveStatus(status);
+            
+            // Refresh job data to show updated status
+            loadCurrentJob();
+            loadStats();
+        } else {
+            showNotification('Error updating status: ' + (data.error || 'Unknown error'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error updating status', 'error');
+    });
+}
+
+
+        function highlightActiveStatus(status) {
+            document.querySelectorAll('.status-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const statusMap = {
+                'accepted': 0,
+                'en_route': 1, 
+                'arrived': 2,
+                'in_progress': 3,
+                'completed': 4
+            };
+            
+            const buttons = document.querySelectorAll('.status-btn');
+            if (buttons[statusMap[status]]) {
+                buttons[statusMap[status]].classList.add('active');
+            }
+        }
+
+        function loadCurrentJob() {
+            fetch('../backend/get_job_tracking.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data) {
+                    currentJob = data.data;
+                    updateJobInfo(data.data);
+                } else {
+                    // No active job
+                    document.getElementById('jobType').textContent = 'No active job';
+                    document.getElementById('customerName').textContent = '-';
+                    document.getElementById('jobLocation').textContent = '-';
+                    document.getElementById('customerPhone').textContent = '-';
+                }
+            })
+            .catch(error => console.error('Error loading job:', error));
+        }
+
+        function updateJobInfo(job) {
+            document.getElementById('jobType').textContent = job.service_type || 'No active job';
+            document.getElementById('customerName').textContent = job.owner_name || '-';
+            document.getElementById('jobLocation').textContent = job.location || '-';
+            document.getElementById('customerPhone').textContent = job.phone_number || '-';
+            
+            highlightActiveStatus(job.job_status || 'pending');
+        }
+
+        function updateMyLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    showNotification('Location updated successfully!', 'success');
+                }, function(error) {
+                    console.error('Geolocation error:', error);
+                    showNotification('Unable to get your location', 'error');
+                });
+            }
+        }
+
+        function toggleOnlineStatus() {
+            isOnline = !isOnline;
+            updateOnlineStatusUI();
+            
+            if (isOnline) {
+                loadPendingRequests();
+                loadStats();
+                // Start auto-refresh for requests
+                setInterval(loadPendingRequests, 10000); // Refresh every 10 seconds
+            }
+        }
+
+        function updateOnlineStatusUI() {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const toggleBtn = document.getElementById('toggleBtn');
+            
+            if (isOnline) {
+                statusDot.classList.add('online');
+                statusText.textContent = 'Online';
+                toggleBtn.textContent = 'Go Offline';
+                toggleBtn.style.backgroundColor = '#dc2626';
+                document.getElementById('offlineMessage').innerHTML = '<p style="color: green;">✅ You are online and ready to receive job requests!</p>';
+            } else {
+                statusDot.classList.remove('online');
+                statusText.textContent = 'Offline';
+                toggleBtn.textContent = 'Go Online';
+                toggleBtn.style.backgroundColor = '#16a34a';
+                document.getElementById('offlineMessage').innerHTML = '<p>You are offline. Go online to receive new job requests.</p>';
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserInfo();
+            initializeProviderMap();
+            loadCurrentJob();
+            updateOnlineStatusUI();
+            loadStats();
+        });
+
+        // Load current job - FIXED VERSION
+function loadCurrentJob() {
+    fetch('../backend/get_job_tracking.php')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.data) {
+            currentJob = data.data;
+            updateServiceProviderJobInfo(data.data);
+            
+            // Update map with customer location
+            if (data.data.owner_lat && data.data.owner_lng) {
+                updateCustomerLocationOnMap(data.data.owner_lat, data.data.owner_lng);
+            }
+        } else {
+            // No active job - reset display
+            resetJobDisplay();
+        }
+    })
+    .catch(error => {
+        console.error('Error loading job:', error);
+        resetJobDisplay();
+    });
+}
+
+// Update job info display - FIXED VERSION
+function updateServiceProviderJobInfo(job) {
+    // Update job details
+    document.getElementById('jobType').textContent = job.service_type || 'No active job';
+    document.getElementById('customerName').textContent = job.owner_name || '-';
+    document.getElementById('jobLocation').textContent = job.location || '-';
+    document.getElementById('customerPhone').textContent = job.phone_number || '-';
+    
+    // Update status buttons
+    highlightActiveStatus(job.job_status || 'accepted');
+    
+    // Show vehicle details if available
+    if (job.vehicle_brand && job.vehicle_model) {
+        const vehicleInfo = `${job.vehicle_brand} ${job.vehicle_model} (${job.number_plate || 'N/A'})`;
+        // Add vehicle info display if you have the element
+        if (document.getElementById('vehicleInfo')) {
+            document.getElementById('vehicleInfo').textContent = vehicleInfo;
+        }
+    }
+}
+
+// Add customer location marker on map
+function updateCustomerLocationOnMap(lat, lng) {
+    if (customerMarker) {
+        customerMarker.setLatLng([lat, lng]);
+    } else {
+        const customerIcon = L.divIcon({
+            className: 'custom-marker customer-marker',
+            html: '<i class="fas fa-user" style="color: #dc2626; font-size: 20px;"></i>',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+        customerMarker = L.marker([lat, lng], {icon: customerIcon})
+            .addTo(map)
+            .bindPopup('Customer Location');
+    }
+    
+    // Fit map to show both markers
+    if (providerMarker && customerMarker) {
+        const group = L.featureGroup([providerMarker, customerMarker]);
+        map.fitBounds(group.getBounds().pad(0.1));
+    }
+}
+
+// Reset job display when no active job
+function resetJobDisplay() {
+    document.getElementById('jobType').textContent = 'No active job';
+    document.getElementById('customerName').textContent = '-';
+    document.getElementById('jobLocation').textContent = '-';  
+    document.getElementById('customerPhone').textContent = '-';
+    
+    // Remove customer marker
+    if (customerMarker) {
+        map.removeLayer(customerMarker);
+        customerMarker = null;
+    }
+    
+    // Reset status buttons
+    document.querySelectorAll('.status-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+}
+// Display pending requests with Accept and Decline buttons
+function displayPendingRequests(requests) {
+    const container = document.getElementById('requestsContainer');
+    const offlineMessage = document.getElementById('offlineMessage');
+    
+    if (!isOnline) {
+        offlineMessage.innerHTML = '<p>You are offline. Go online to receive new job requests.</p>';
+        return;
+    }
+
+    if (requests.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No pending requests at the moment.</p>';
+        return;
+    }
+
+    const requestsHTML = requests.map(request => `
+        <div class="request-card" id="request-${request.request_id}" style="border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; background: white;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="flex: 1;">
+                    <h4 style="color: #16a34a; margin-bottom: 0.5rem;">🚗 ${request.service_type}</h4>
+                    <p><strong>Customer:</strong> ${request.customer_name}</p>
+                    <p><strong>Vehicle:</strong> ${request.vehicle_brand} ${request.vehicle_model} (${request.number_plate})</p>
+                    <p><strong>Location:</strong> ${request.location}</p>
+                    <p><strong>Phone:</strong> ${request.phone_number}</p>
+                    <p><strong>Time:</strong> ${new Date(request.request_time).toLocaleString()}</p>
+                </div>
+                <div style="display: flex; gap: 10px; flex-direction: column;">
+                    <button class="btn btn-primary" onclick="acceptJob(${request.request_id})" 
+                            style="background: #16a34a; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;">
+                        ✅ Accept Job
+                    </button>
+                    <button class="btn btn-danger" onclick="declineJob(${request.request_id})" 
+                            style="background: #dc2626; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;">
+                        ❌ Decline Job
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    container.innerHTML = requestsHTML;
+}
+// Decline a job
+function declineJob(requestId) {
+    if (!confirm('Are you sure you want to decline this job?')) {
+        return;
+    }
+
+    fetch('../backend/decline_service_request.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            request_id: requestId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remove the request card from UI immediately
+            const requestCard = document.getElementById(`request-${requestId}`);
+            if (requestCard) {
+                requestCard.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    requestCard.remove();
+                    
+                    // Check if no more requests
+                    const container = document.getElementById('requestsContainer');
+                    if (container.children.length === 0) {
+                        container.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No pending requests at the moment.</p>';
+                    }
+                }, 300);
+            }
+            
+            // Show success message
+            showNotification('Job declined successfully', 'error');
+        } else {
+            alert('Error declining job: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error declining job');
+    });
+}
+
+// Show notification function
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem;
+        background: ${type === 'error' ? '#dc2626' : '#16a34a'};
+        color: white;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 1000;
+        animation: slideIn 0.3s ease-out;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+// Navigation Functions
+function showDashboard() {
+    hideAllViews();
+    document.querySelector('.main-content').style.display = 'block';
+    setActiveNav('dashboard');
+}
+
+function showMyJobs() {
+    hideAllViews();
+    document.getElementById('myJobsView').style.display = 'block';
+    setActiveNav('myjobs');
+    loadMyJobs();
+}
+
+function showReviews() {
+    hideAllViews();
+    document.getElementById('reviewsView').style.display = 'block';
+    setActiveNav('reviews');
+    loadReviews();
+}
+
+function showProfile() {
+    hideAllViews();
+    document.getElementById('profileView').style.display = 'block';
+    setActiveNav('profile');
+    loadProfile();
+}
+
+function hideAllViews() {
+    document.querySelector('.main-content').style.display = 'none';
+    const views = ['myJobsView', 'reviewsView', 'profileView'];
+    views.forEach(viewId => {
+        const element = document.getElementById(viewId);
+        if (element) element.style.display = 'none';
+    });
+}
+
+function setActiveNav(activeItem) {
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    const activeLink = document.querySelector(`[onclick*="${activeItem}"]`);
+    if (activeLink) activeLink.classList.add('active');
+}
+
+function loadMyJobs() {
+    fetch('../backend/get_provider_jobs_today.php')
+    .then(response => response.json())
+    .then(data => {
+        displayMyJobs(data);
+    })
+    .catch(error => {
+        console.error('Error loading jobs:', error);
+        displayMyJobs([]);
+    });
+}
+
+function displayMyJobs(jobs) {
+    const container = document.getElementById('myJobsView');
+    let html = '<div class="view-header"><h2>My Jobs</h2></div><div class="content-area">';
+    
+    if (jobs.length === 0) {
+        html += '<p class="no-data">No jobs found.</p>';
+    } else {
+        html += '<div class="jobs-grid">';
+        jobs.forEach(job => {
+            html += `
+                <div class="job-card">
+                    <h4>${job.service_type || 'Service'}</h4>
+                    <p><strong>Status:</strong> ${job.status}</p>
+                    <p><strong>Date:</strong> ${new Date(job.request_time).toLocaleDateString()}</p>
+                </div>
+            `;
+        });
+        html += '</div>';
+    }
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function loadReviews() {
+    fetch('../backend/get_provider_rating.php')
+    .then(response => response.json())
+    .then(data => {
+        displayReviews(data);
+    })
+    .catch(error => {
+        console.error('Error loading reviews:', error);
+        displayReviews([]);
+    });
+}
+
+function displayReviews(reviews) {
+    const container = document.getElementById('reviewsView');
+    let html = '<div class="view-header"><h2>Reviews & Ratings</h2></div><div class="content-area">';
+    
+    if (reviews.length === 0) {
+        html += '<p class="no-data">No reviews yet.</p>';
+    } else {
+        html += '<div class="reviews-list">';
+        reviews.forEach(review => {
+            html += `
+                <div class="review-card">
+                    <div class="review-rating">
+                        ${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}
+                    </div>
+                    <p class="review-text">${review.comment || 'No comment provided'}</p>
+                </div>
+            `;
+        });
+        html += '</div>';
+    }
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function loadProfile() {
+    fetch('../backend/get_user_info.php')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayProfile(data.user);
+        } else {
+            displayProfile({});
+        }
+    })
+    .catch(error => {
+        console.error('Error loading profile:', error);
+        displayProfile({});
+    });
+}
+
+function displayProfile(user) {
+    const container = document.getElementById('profileView');
+    const html = `
+        <div class="view-header">
+            <h2>Profile</h2>
+        </div>
+        <div class="content-area">
+            <div class="profile-form">
+                <div class="form-group">
+                    <label>Name:</label>
+                    <input type="text" id="profileName" value="${user.name || ''}" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="profileEmail" value="${user.email || ''}" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Phone:</label>
+                    <input type="tel" id="profilePhone" value="${user.business_phone || ''}" class="form-input">
+                </div>
+                <div class="form-actions">
+                    <button onclick="updateProfile()" class="btn btn-primary">Update Profile</button>
+                </div>
+            </div>
+        </div>
+    `;
+    container.innerHTML = html;
+}
+
+function updateProfile() {
+    showNotification('Profile update functionality coming soon!', 'info');
+}
+
+
+</script>
+<div id="myJobsView" class="dashboard-view" style="display: none;"></div>
+<div id="reviewsView" class="dashboard-view" style="display: none;"></div>
+<div id="profileView" class="dashboard-view" style="display: none;"></div>
+
+
+</body>
+</html>

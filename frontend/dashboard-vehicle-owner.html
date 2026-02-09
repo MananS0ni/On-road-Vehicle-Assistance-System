@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Owner Dashboard - On-Road Assist</title>
+    
+    <!-- Leaflet.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Your existing fonts and styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #f0f4f8;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-dark);
+            display: flex;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--white);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header .logo {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: 500;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+
+        .card h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .emergency-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: var(--white);
+            text-align: center;
+        }
+
+        .emergency-card h3 {
+            color: var(--white);
+        }
+
+        .emergency-btn {
+            background-color: var(--white);
+            color: var(--primary-color);
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .emergency-btn:hover {
+            background-color: #f8fafc;
+        }
+
+        .map-container {
+            height: 400px;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .vehicle-info {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .vehicle-info div {
+            flex: 1;
+        }
+
+        .vehicle-info label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+
+        .tracking-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-radius: 8px;
+        }
+        .dashboard-view {
+    padding: 2rem;
+    background: #f8fafc;
+    min-height: calc(100vh - 2rem);
+    display: none;
+}
+
+.active-view {
+    display: block !important;
+}
+
+.view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.view-header h2 {
+    margin: 0;
+    color: #1f2937;
+}
+
+.content-area {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.no-data {
+    text-align: center;
+    color: #6b7280;
+    font-size: 1.1rem;
+    padding: 3rem;
+}
+
+.jobs-grid, .vehicles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.job-card, .vehicle-card {
+    background: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.vehicle-card h4 {
+    margin: 0 0 0.5rem 0;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.vehicle-card p {
+    margin: 0 0 0.25rem 0;
+    color: #6b7280;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.form-input:focus {
+    border-color: #16a34a;
+    outline: none;
+}
+
+    </style>
+</head>
+<body>
+    <!-- Sidebar (Your Original Style) -->
+    <nav class="sidebar">
+    <div class="logo">
+        <span class="logo-icon">🚗</span>
+        <h2>On-Road Assist</h2>
+    </div>
+    
+    <ul class="nav-menu">
+        <li class="nav-item">
+            <a href="#" class="nav-link active" onclick="showDashboard(event)">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="#" class="nav-link" onclick="showMyVehicles(event)">
+                <i class="fas fa-car"></i>
+                My Vehicles
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="#" class="nav-link" onclick="showServiceHistory(event)">
+                <i class="fas fa-history"></i>
+                Service History
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="#" class="nav-link" onclick="showProfile(event)">
+                <i class="fas fa-user"></i>
+                Profile
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="#" class="nav-link" onclick="logout(event)">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+        </li>
+    </ul>
+</nav>
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <h1 id="welcomeMessage">Welcome Back!</h1>
+            <div class="user-profile">
+                <div class="user-avatar" id="userAvatar">?</div>
+                <span id="userName">Loading...</span>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Emergency Request Card -->
+            <div class="card emergency-card">
+                <h3><i class="fas fa-exclamation-triangle"></i> Stuck on the road?</h3>
+                <p>Don't worry, we've got you covered. Request help with a single click.</p>
+                <button class="emergency-btn" onclick="requestEmergencyService()">
+                    <i class="fas fa-tools"></i> Request Emergency Service
+                </button>
+            </div>
+
+            <!-- Vehicle Info Card -->
+            <div class="card">
+                <h3><i class="fas fa-car"></i> My Vehicle</h3>
+                <div class="vehicle-info" id="vehicleInfo">
+                    <div>
+                        <label>Brand & Model</label>
+                        <p>Loading...</p>
+                    </div>
+                    <div>
+                        <label>Plate Number</label>
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Status Card -->
+            <div class="card">
+                <h3><i class="fas fa-info-circle"></i> Recent Service Request</h3>
+                <div id="currentStatus">
+                    <p>No recent service history.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Tracking Map -->
+        <div class="card">
+            <h3><i class="fas fa-map-marker-alt"></i> Live Location Tracking</h3>
+            <div class="tracking-info">
+                <div>
+                    <span>Provider Status: <span id="providerStatus">Not assigned</span></span>
+                </div>
+                <div>
+                    <button class="btn btn-primary" onclick="shareLocation()">
+                        <i class="fas fa-location-arrow"></i> Share My Location
+                    </button>
+                </div>
+            </div>
+            <div class="map-container" id="trackingMap"></div>
+        </div>
+
+        <!-- Hidden Views -->
+        <div id="myVehiclesView" class="dashboard-view" style="display: none;"></div>
+        <div id="serviceHistoryView" class="dashboard-view" style="display: none;"></div>
+        <div id="profileView" class="dashboard-view" style="display: none;"></div>
+    </main>
+
+    <!-- Leaflet.js JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        let map;
+        let ownerMarker;
+        let providerMarker;
+        let ownerLocation = null;
+        let trackingInterval;
+        let currentUser = null;
+
+        // Load user information on page load
+        function loadUserInfo() {
+            fetch('../backend/get_user_info.php')  // FIXED PATH
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentUser = data.user;
+                    updateUserInterface(data.user);
+                } else {
+                    console.error('Error loading user info:', data.error);
+                    // Set defaults if error
+                    document.getElementById('userName').textContent = 'User';
+                    document.getElementById('userAvatar').textContent = 'U';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching user info:', error);
+                document.getElementById('userName').textContent = 'User';
+                document.getElementById('userAvatar').textContent = 'U';
+            });
+        }
+
+        // Update user interface with real data
+        function updateUserInterface(user) {
+            // Update header
+            document.getElementById('welcomeMessage').textContent = `Welcome Back, ${user.name}!`;
+            document.getElementById('userName').textContent = user.name;
+            
+            // Update user avatar with initials
+            const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.getElementById('userAvatar').textContent = initials;
+        }
+
+        // Initialize the map
+        function initializeMap() {
+            map = L.map('trackingMap').setView([23.0225, 72.5714], 13);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Custom icons
+            const ownerIcon = L.divIcon({
+                className: 'custom-marker owner-marker',
+                html: '<i class="fas fa-user" style="color: #4f46e5; font-size: 20px;"></i>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+
+            const providerIcon = L.divIcon({
+                className: 'custom-marker provider-marker',
+                html: '<i class="fas fa-tools" style="color: #10b981; font-size: 20px;"></i>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+
+            // Get user's current location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    ownerLocation = [position.coords.latitude, position.coords.longitude];
+                    ownerMarker = L.marker(ownerLocation, {icon: ownerIcon})
+                        .addTo(map)
+                        .bindPopup('Your Location');
+                    
+                    map.setView(ownerLocation, 15);
+                    updateLocation(position.coords.latitude, position.coords.longitude);
+                }, function(error) {
+                    console.error('Geolocation error:', error);
+                    alert('Unable to get your location. Please allow location access.');
+                });
+            }
+
+            // Start tracking updates
+            startTracking();
+        }
+
+        // Update location on server
+        function updateLocation(lat, lng) {
+            fetch('../backend/update_location.php', {  // FIXED PATH
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    latitude: lat,
+                    longitude: lng
+                })
+            }).catch(error => console.error('Error updating location:', error));
+        }
+
+        // Share location function
+        function shareLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    ownerLocation = [lat, lng];
+                    
+                    if (ownerMarker) {
+                        ownerMarker.setLatLng([lat, lng]);
+                    } else {
+                        const ownerIcon = L.divIcon({
+                            className: 'custom-marker owner-marker',
+                            html: '<i class="fas fa-user" style="color: #4f46e5; font-size: 20px;"></i>',
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 15]
+                        });
+                        ownerMarker = L.marker([lat, lng], {icon: ownerIcon})
+                            .addTo(map)
+                            .bindPopup('Your Location');
+                    }
+                    
+                    map.setView([lat, lng], 15);
+                    updateLocation(lat, lng);
+                    
+                    alert('Location shared successfully!');
+                }, function(error) {
+                    console.error('Geolocation error:', error);
+                    alert('Unable to get your location. Please allow location access.');
+                });
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+
+        // Start tracking job status and provider location
+        function startTracking() {
+            trackingInterval = setInterval(function() {
+                fetch('../backend/get_job_tracking.php')  // FIXED PATH
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        updateTrackingInfo(data.data);
+                    }
+                })
+                .catch(error => console.error('Error fetching tracking data:', error));
+            }, 5000); // Update every 5 seconds
+        }
+
+
+
+        // Update status timeline
+        function updateStatusTimeline(currentStatus) {
+            const timeline = document.getElementById('statusTimeline');
+            if (timeline) {
+                const statuses = [
+                    {key: 'pending', label: 'Request Submitted'},
+                    {key: 'accepted', label: 'Provider Assigned'},
+                    {key: 'en_route', label: 'Provider En Route'},
+                    {key: 'arrived', label: 'Provider Arrived'},
+                    {key: 'in_progress', label: 'Service in Progress'},
+                    {key: 'completed', label: 'Service Completed'}
+                ];
+                
+                const currentIndex = statuses.findIndex(s => s.key === currentStatus);
+                
+                timeline.innerHTML = statuses.map((status, index) => `
+                    <div class="timeline-item ${index <= currentIndex ? 'active' : ''}">
+                        <span>${status.label}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Request emergency service - FIXED VERSION
+        // Request emergency service - FIXED VERSION with Dropdown
+function requestEmergencyService() {
+    if (!ownerLocation) {
+        shareLocation(); // Auto-share location first
+        setTimeout(() => {
+            if (ownerLocation) {
+                showServiceTypeModal();
+            } else {
+                alert('Please allow location access first!');
+            }
+        }, 2000);
+    } else {
+        showServiceTypeModal();
+    }
+}
+
+// Show service type selection modal
+function showServiceTypeModal() {
+    const modal = document.createElement('div');
+    modal.id = 'serviceModal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+        ">
+            <h3 style="margin: 0 0 1.5rem 0; color: #1f2937; text-align: center;">🚨 Select Service Type</h3>
+            
+            <select id="serviceTypeSelect" style="
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #e5e7eb;
+                border-radius: 8px;
+                font-size: 16px;
+                margin-bottom: 1.5rem;
+                background: white;
+                cursor: pointer;
+            ">
+                <option value="">-- Select a service --</option>
+                <option value="Towing">🚛 Towing</option>
+                <option value="Battery Jump">🔋 Battery Jump Start</option>
+                <option value="Tire Change">🛞 Tire Change</option>
+                <option value="Fuel Delivery">⛽ Fuel Delivery</option>
+                <option value="Lockout Service">🔐 Lockout Service</option>
+                <option value="Engine Repair">🔧 Engine Repair</option>
+                <option value="Other">❓ Other</option>
+            </select>
+            
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button onclick="closeServiceModal()" style="
+                    padding: 10px 20px;
+                    border: 2px solid #d1d5db;
+                    background: white;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    color: #374151;
+                ">Cancel</button>
+                
+                <button onclick="submitServiceRequest()" style="
+                    padding: 10px 20px;
+                    border: none;
+                    background: #dc2626;
+                    color: white;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-weight: bold;
+                ">🚨 Request Service</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// Close service modal
+function closeServiceModal() {
+    const modal = document.getElementById('serviceModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// Submit the service request
+function submitServiceRequest() {
+    const serviceTypeSelect = document.getElementById('serviceTypeSelect');
+    const serviceType = serviceTypeSelect.value;
+    
+    if (!serviceType) {
+        alert('Please select a service type!');
+        return;
+    }
+    
+    if (!ownerLocation) {
+        alert('Location not available. Please try again.');
+        return;
+    }
+    
+    // Close the modal
+    closeServiceModal();
+    
+    // Submit the request
+    fetch('../backend/create_service_request.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            service_type: serviceType,
+            location: `Lat: ${ownerLocation[0]}, Lng: ${ownerLocation[1]}`,
+            latitude: ownerLocation[0],
+            longitude: ownerLocation[1]
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showSuccessMessage(serviceType, data.request_id);
+        } else {
+            alert('Error: ' + (data.error || 'Failed to submit request'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error submitting request');
+    });
+}
+
+// Show success message
+function showSuccessMessage(serviceType, requestId) {
+    const successModal = document.createElement('div');
+    successModal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    `;
+    
+    successModal.innerHTML = `
+        <div style="
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        ">
+            <div style="font-size: 48px; margin-bottom: 1rem;">✅</div>
+            <h3 style="margin: 0 0 1rem 0; color: #16a34a;">Request Submitted!</h3>
+            <p style="margin: 0 0 1rem 0; color: #6b7280;">
+                Your <strong>${serviceType}</strong> request has been submitted successfully!
+            </p>
+            <p style="margin: 0 0 1.5rem 0; color: #374151;">
+                <strong>Request ID:</strong> ${requestId}
+            </p>
+            <button onclick="this.parentElement.parentElement.remove()" style="
+                padding: 10px 30px;
+                border: none;
+                background: #16a34a;
+                color: white;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: bold;
+            ">OK</button>
+        </div>
+    `;
+    
+    document.body.appendChild(successModal);
+}
+
+
+        // Load vehicle information
+        function loadVehicleInfo() {
+            fetch('../backend/get_user_vehicles.php')
+            .then(response => response.json())
+            .then(data => {
+                const vehicleInfo = document.getElementById('vehicleInfo');
+                if (data && data.length > 0) {
+                    const vehicle = data[0];
+                    vehicleInfo.innerHTML = `
+                        <div>
+                            <label>Brand & Model</label>
+                            <p>${vehicle.vehicle_brand} ${vehicle.vehicle_model}</p>
+                        </div>
+                        <div>
+                            <label>Plate Number</label>
+                            <p>${vehicle.number_plate}</p>
+                        </div>
+                    `;
+                } else {
+                    setDefaultVehicleInfo();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading vehicle info:', error);
+                setDefaultVehicleInfo();
+            });
+        }
+
+        function setDefaultVehicleInfo() {
+            const vehicleInfo = document.getElementById('vehicleInfo');
+            vehicleInfo.innerHTML = `
+                <div>
+                    <label>Brand & Model</label>
+                    <p>No vehicle information available.</p>
+                </div>
+                <div>
+                    <label>Plate Number</label>
+                    <p>-</p>
+                </div>
+            `;
+        }
+
+        // View switching functions
+        function showDashboard(event) {
+            document.querySelector('.main-content').style.display = 'block';
+            document.querySelectorAll('.dashboard-view').forEach(view => view.style.display = 'none');
+            if (event) {
+                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                const clickedLink = event.target.closest('.nav-link');
+                if (clickedLink) clickedLink.classList.add('active');
+            }
+        }
+
+        function showMyVehicles(event) {
+            document.querySelector('.main-content').style.display = 'none';
+            document.getElementById('myVehiclesView').style.display = 'block';
+            document.getElementById('myVehiclesView').classList.add('active-view');
+            document.querySelectorAll('.dashboard-view').forEach(view => {
+                if (view.id !== 'myVehiclesView') view.style.display = 'none';
+            });
+            if (event) {
+                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                const clickedLink = event.target.closest('.nav-link');
+                if (clickedLink) clickedLink.classList.add('active');
+            }
+            loadMyVehicles();
+        }
+
+        function showServiceHistory(event) {
+            document.querySelector('.main-content').style.display = 'none';
+            document.getElementById('serviceHistoryView').style.display = 'block';
+            document.getElementById('serviceHistoryView').classList.add('active-view');
+            document.querySelectorAll('.dashboard-view').forEach(view => {
+                if (view.id !== 'serviceHistoryView') view.style.display = 'none';
+            });
+            if (event) {
+                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                const clickedLink = event.target.closest('.nav-link');
+                if (clickedLink) clickedLink.classList.add('active');
+            }
+            // Load service history data here
+        }
+
+        function showProfile(event) {
+            document.querySelector('.main-content').style.display = 'none';
+            document.getElementById('profileView').style.display = 'block';
+            document.getElementById('profileView').classList.add('active-view');
+            document.querySelectorAll('.dashboard-view').forEach(view => {
+                if (view.id !== 'profileView') view.style.display = 'none';
+            });
+            if (event) {
+                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                const clickedLink = event.target.closest('.nav-link');
+                if (clickedLink) clickedLink.classList.add('active');
+            }
+            // Load profile data here
+        }
+
+        function logout(event) {
+            if (event) {
+                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                const clickedLink = event.target.closest('.nav-link');
+                if (clickedLink) clickedLink.classList.add('active');
+            }
+            // Clear session and redirect to login
+            fetch('../backend/logout.php', { method: 'POST' })
+                .then(() => {
+                    window.location.href = '../index.html';
+                })
+                .catch(() => {
+                    window.location.href = '../index.html';
+                });
+        }
+
+        // Load my vehicles
+        function loadMyVehicles() {
+            fetch('../backend/get_user_vehicles.php')
+            .then(response => response.json())
+            .then(data => {
+                const view = document.getElementById('myVehiclesView');
+                if (data && data.length > 0) {
+                    const vehiclesGrid = data.map(vehicle => `
+                        <div class="vehicle-card">
+                            <h4>${vehicle.vehicle_brand} ${vehicle.vehicle_model}</h4>
+                            <p><strong>Plate Number:</strong> ${vehicle.number_plate}</p>
+                            <p><strong>Fuel Type:</strong> ${vehicle.fuel_type}</p>
+                            <p><strong>Year:</strong> ${vehicle.year}</p>
+                        </div>
+                    `).join('');
+                    view.innerHTML = `
+                        <div class="view-header">
+                            <h2>My Vehicles</h2>
+                            <button class="btn btn-primary" onclick="showAddVehicleForm()">Add New Vehicle</button>
+                        </div>
+                        <div class="content-area">
+                            <div class="vehicles-grid">
+                                ${vehiclesGrid}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    view.innerHTML = `
+                        <div class="view-header">
+                            <h2>My Vehicles</h2>
+                            <button class="btn btn-primary" onclick="showAddVehicleForm()">Add New Vehicle</button>
+                        </div>
+                        <div class="content-area">
+                            <div class="no-data">
+                                <i class="fas fa-car" style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+                                <p>No vehicles registered yet.</p>
+                                <p style="margin-top: 0.5rem;">Add your first vehicle to get started.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading vehicles:', error);
+                document.getElementById('myVehiclesView').innerHTML = `
+                    <div class="view-header">
+                        <h2>My Vehicles</h2>
+                    </div>
+                    <div class="content-area">
+                        <div class="no-data">
+                            <p>Error loading vehicles. Please try again.</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function showAddVehicleForm() {
+            // Implement add vehicle form modal or redirect
+            alert('Add vehicle functionality coming soon!');
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserInfo();
+            initializeMap();
+            loadVehicleInfo();
+            showDashboard(); // Default view
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (trackingInterval) {
+                clearInterval(trackingInterval);
+            }
+        });
+
+
+        // Update tracking information - FIXED VERSION for Vehicle Owner
+function updateTrackingInfo(trackingData) {
+    // Update status  
+    const statusElement = document.getElementById('currentStatus');
+    const providerStatusElement = document.getElementById('providerStatus');
+    
+    let statusClass = 'status-pending';
+    let statusText = trackingData.status || 'pending';
+    
+    switch (statusText) {
+        case 'accepted':
+        case 'en_route':
+        case 'arrived':
+        case 'in_progress':
+            statusClass = 'status-active';
+            break;
+        case 'completed':
+            statusClass = 'status-completed';
+            break;
+    }
+    
+    if (statusElement) {
+        statusElement.innerHTML = `
+            <span class="status-indicator ${statusClass}">
+                <i class="fas fa-clock"></i>
+                ${statusText.replace('_', ' ').toUpperCase()}
+            </span>
+        `;
+    }
+    
+    // Update provider information
+    if (trackingData.provider_name) {
+        if (providerStatusElement) {
+            providerStatusElement.textContent = `Provider: ${trackingData.provider_name} - ${statusText}`;
+        }
+        
+        // Update provider marker on map
+        if (trackingData.provider_lat && trackingData.provider_lng) {
+            updateProviderLocationOnMap(trackingData.provider_lat, trackingData.provider_lng, trackingData.provider_name);
+        }
+    } else {
+        if (providerStatusElement) {
+            providerStatusElement.textContent = 'Provider Status: Not assigned';
+        }
+    }
+    
+    updateStatusTimeline(statusText);
+}
+
+// Add provider location marker on map
+function updateProviderLocationOnMap(lat, lng, providerName) {
+    if (providerMarker) {
+        providerMarker.setLatLng([lat, lng]);
+    } else {
+        const providerIcon = L.divIcon({
+            className: 'custom-marker provider-marker',
+            html: '<i class="fas fa-tools" style="color: #16a34a; font-size: 20px;"></i>',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+        providerMarker = L.marker([lat, lng], {icon: providerIcon})
+            .addTo(map)
+            .bindPopup(`${providerName} - Service Provider`);
+    }
+    
+    // Fit map to show both markers
+    if (ownerMarker && providerMarker) {
+        const group = L.featureGroup([ownerMarker, providerMarker]);
+        map.fitBounds(group.getBounds().pad(0.1));
+    }
+}
+
+
+
+
+    </script>
+</body>
+</html>

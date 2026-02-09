@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>On-Road Assist - 24/7 Vehicle Breakdown Assistance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .hero-section {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1568605117036-5fe5e7167b4f?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+
+    <!-- Header / Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-indigo-600">
+                <i class="fa-solid fa-car-burst"></i> On-Road Assist
+            </div>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#" class="text-gray-600 hover:text-indigo-600">Home</a>
+                <a href="#services" class="text-gray-600 hover:text-indigo-600">Services</a>
+                <a href="#about" class="text-gray-600 hover:text-indigo-600">About Us</a>
+                <a href="#contact" class="text-gray-600 hover:text-indigo-600">Contact</a>
+                <a href="#" id="logout-link" class="text-gray-600 hover:text-indigo-600">Logout</a>
+            </div>
+            <!-- CORRECTED LINK -->
+            <a href="index.html"
+                class="bg-indigo-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-indigo-700 transition duration-300">
+                Login / Register
+            </a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section text-white">
+        <div class="container mx-auto px-6 py-32 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-4">Stuck on the Road? Help is Moments Away.</h1>
+            <p class="text-lg md:text-xl text-gray-200 mb-8 max-w-3xl mx-auto">Instant, reliable, and professional
+                vehicle breakdown assistance, available 24/7. Get connected with a trusted service provider near you.
+            </p>
+            <!-- CORRECTED LINK -->
+            <a href="index.html"
+                class="bg-white text-indigo-600 font-bold text-lg px-8 py-4 rounded-lg hover:bg-gray-200 transition duration-300">
+                Get Help Now
+            </a>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold mb-2 text-gray-800">How It Works</h2>
+            <p class="text-gray-600 mb-12">Get back on the road in 3 simple steps.</p>
+            <div class="grid md:grid-cols-3 gap-12">
+                <div class="flex flex-col items-center">
+                    <div
+                        class="bg-indigo-100 text-indigo-600 w-20 h-20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-mobile-screen-button text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">1. Request Help</h3>
+                    <p class="text-gray-600">Open the app, pinpoint your location, and select the service you need.</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div
+                        class="bg-indigo-100 text-indigo-600 w-20 h-20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-magnifying-glass-location text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">2. Get Matched</h3>
+                    <p class="text-gray-600">We instantly connect you with the nearest available service provider.</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div
+                        class="bg-indigo-100 text-indigo-600 w-20 h-20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-road-circle-check text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">3. Track & Go</h3>
+                    <p class="text-gray-600">Track your provider's arrival in real-time and get back on your journey.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold mb-2 text-gray-800">Our Services</h2>
+            <p class="text-gray-600 mb-12">Comprehensive assistance for any situation.</p>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition">
+                    <i class="fa-solid fa-truck-pickup text-4xl text-indigo-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Towing Service</h3>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition">
+                    <i class="fa-solid fa-car-battery text-4xl text-indigo-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Battery Jumpstart</h3>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition">
+                    <i class="fa-solid fa-circle-dot text-4xl text-indigo-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Flat Tire Repair</h3>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition">
+                    <i class="fa-solid fa-gas-pump text-4xl text-indigo-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Fuel Delivery</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="bg-gray-800 text-white">
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">On-Road Assist</h3>
+                    <p class="text-gray-400">Your trusted partner on the road, ensuring you're never left stranded.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul>
+                        <li class="mb-2"><a href="#about" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li class="mb-2"><a href="#services" class="text-gray-400 hover:text-white">Services</a></li>
+                        <!-- CORRECTED LINK -->
+                        <li class="mb-2"><a href="index.html" class="text-gray-400 hover:text-white">Become a
+                                Provider</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Contact Us</h3>
+                    <p class="text-gray-400 mb-2"><i class="fa-solid fa-envelope mr-2"></i> support@onroadassist.com</p>
+                    <p class="text-gray-400"><i class="fa-solid fa-phone mr-2"></i> +91 12345 67890</p>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-700 text-center text-gray-500">
+                <p>&copy; 2025 On-Road Assist. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Logout functionality
+        document.getElementById('logout-link').addEventListener('click', function (event) {
+            event.preventDefault();
+            fetch('../backend/logout.php')
+                .then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else {
+                        window.location.href = '../frontend/home.html';
+                    }
+                })
+                .catch(error => {
+                    console.error('Logout failed:', error);
+                    window.location.href = '../frontend/home.html';
+                });
+        });
+    </script>
+
+</body>
+
+</html>

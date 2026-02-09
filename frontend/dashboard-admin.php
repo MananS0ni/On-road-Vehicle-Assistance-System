@@ -1,0 +1,562 @@
+<?php
+session_start();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: ../frontend/index.html");
+    exit();
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - On-Road Assist</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --secondary-color: #f0f4f8;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+            --green: #22c55e;
+            --yellow: #f59e0b;
+            --red: #ef4444;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-dark);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--white);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header .logo-icon {
+            font-size: 1.75rem;
+            color: var(--primary-color);
+        }
+
+        .sidebar-header .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .sidebar-nav a i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .card-content h3 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .card-content p {
+            margin: 0;
+            color: var(--text-light);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-container {
+            background-color: var(--white);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        thead {
+            background-color: #f9fafb;
+        }
+
+        th {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+
+        .status-completed {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-inprogress {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+
+   <nav class="sidebar">
+    <div class="sidebar-header">
+        <span class="logo-icon">⚙️</span>
+        <span class="logo-text">On-Road Assist</span>
+    </div>
+    
+    <div class="sidebar-nav">
+        <a href="#" class="active" onclick="showDashboard()">
+            <i class="fas fa-tachometer-alt"></i>
+            Dashboard
+        </a>
+        <a href="#" onclick="showUsers()">
+            <i class="fas fa-users"></i>
+            Users
+        </a>
+        <a href="#" onclick="showProviders()">
+            <i class="fas fa-tools"></i>
+            Providers
+        </a>
+        <a href="#" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </a>
+    </div>
+
+    <div class="sidebar-footer">
+        <!-- Footer content if needed -->
+    </div>
+</nav>
+
+
+    <main class="main-content">
+        <header class="dashboard-header">
+            <h1>Admin Dashboard</h1>
+            <!-- Can add user profile here later -->
+        </header>
+
+        <div class="kpi-grid">
+            <div class="card">
+                <div class="card-header"><i class="fa-solid fa-users card-icon"></i></div>
+                <div class="card-content">
+                    <h3 id="total-users-kpi">0</h3>
+                    <p>Total Users</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><i class="fa-solid fa-user-gear card-icon"></i></div>
+                <div class="card-content">
+                    <h3 id="total-providers-kpi">0</h3>
+                    <p>Total Providers</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><i class="fa-solid fa-check-double card-icon"></i></div>
+                <div class="card-content">
+                    <h3 id="jobs-today-kpi">0</h3>
+                    <p>Jobs Completed (Today)</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><i class="fa-solid fa-wallet card-icon"></i></div>
+                <div class="card-content">
+                    <h3 id="revenue-today-kpi">₹0</h3>
+                    <p>Total Revenue (Today)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-layout" id="dashboard-main">
+            <div class="main-panel">
+                <h2 class="section-title">Live Service Requests</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Request ID</th>
+                                <th>User</th>
+                                <th>Provider</th>
+                                <th>Service</th>
+                                <th>Status</th>
+                                <th>Location</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="live-requests-tbody">
+                            <!-- Live request data will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="side-panel">
+                <h2 class="section-title">Pending Verifications</h2>
+                <div id="pending-verifications-container">
+                    <!-- Pending verification cards will be inserted here by JavaScript -->
+                    <p style="color: var(--text-light);">No pending verifications.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="users-section" style="display: none;">
+            <h2 class="section-title">Users Details</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody">
+                        <!-- Users data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="providers-section" style="display: none;">
+            <h2 class="section-title">Providers Details</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Business Name</th>
+                            <th>Phone</th>
+                            <th>Rating</th>
+                            <th>Availability</th>
+                        </tr>
+                    </thead>
+                    <tbody id="providers-tbody">
+                        <!-- Providers data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadKPIs();
+            loadLiveRequests();
+            loadPendingVerifications();
+
+            // Poll for updates every 10 seconds
+            setInterval(() => {
+                loadKPIs();
+                loadLiveRequests();
+                loadPendingVerifications();
+            }, 10000);
+        });
+
+        async function loadKPIs() {
+            try {
+                const [usersRes, providersRes, jobsRes, revenueRes] = await Promise.all([
+                    fetch('../backend/get_total_users.php'),
+                    fetch('../backend/get_total_providers.php'),
+                    fetch('../backend/get_jobs_today.php'),
+                    fetch('../backend/get_revenue_today.php')
+                ]);
+
+                const users = await usersRes.json();
+                const providers = await providersRes.json();
+                const jobs = await jobsRes.json();
+                const revenue = await revenueRes.json();
+
+                document.getElementById('total-users-kpi').textContent = users.total_users;
+                document.getElementById('total-providers-kpi').textContent = providers.total_providers;
+                document.getElementById('jobs-today-kpi').textContent = jobs.jobs_today;
+                document.getElementById('revenue-today-kpi').textContent = '₹' + (revenue.revenue_today || 0);
+            } catch (error) {
+                console.error('Error loading KPIs:', error);
+            }
+        }
+
+        async function loadLiveRequests() {
+            try {
+                const response = await fetch('../backend/get_live_requests.php');
+                const data = await response.json();
+                const tbody = document.getElementById('live-requests-tbody');
+                tbody.innerHTML = '';
+
+                if (data.requests.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7">No live requests.</td></tr>';
+                    return;
+                }
+
+                data.requests.forEach(request => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${request.request_id}</td>
+                        <td>${request.user_name}</td>
+                        <td>${request.provider_name || 'Not assigned'}</td>
+                        <td>${request.service_type}</td>
+                        <td><span class="status-badge status-inprogress">${request.status}</span></td>
+                        <td>${request.location}</td>
+                        <td>${new Date(request.request_time).toLocaleDateString()}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading live requests:', error);
+            }
+        }
+
+        async function loadPendingVerifications() {
+            try {
+                const response = await fetch('../backend/get_pending_verifications.php');
+                const data = await response.json();
+                const container = document.getElementById('pending-verifications-container');
+                container.innerHTML = '';
+
+                if (data.pending_verifications.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-light);">No pending verifications.</p>';
+                    return;
+                }
+
+                data.pending_verifications.forEach(verification => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <i class="fa-solid fa-file-alt card-icon"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>${verification.full_name}</h3>
+                            <p>${verification.document_type}</p>
+                            <small>Submitted: ${new Date(verification.submitted_at).toLocaleDateString()}</small>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error loading pending verifications:', error);
+            }
+        }
+
+        function showDashboard() {
+            document.getElementById('dashboard-main').style.display = 'grid';
+            document.getElementById('users-section').style.display = 'none';
+            document.getElementById('providers-section').style.display = 'none';
+            // Update active link
+            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+            document.querySelector('.sidebar-nav a[href="#"][onclick="showDashboard()"]').classList.add('active');
+        }
+
+        function showUsers() {
+            document.getElementById('dashboard-main').style.display = 'none';
+            document.getElementById('users-section').style.display = 'block';
+            document.getElementById('providers-section').style.display = 'none';
+            loadUsers();
+            // Update active link
+            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+            document.querySelector('.sidebar-nav a[href="#"][onclick="showUsers()"]').classList.add('active');
+        }
+
+        function showProviders() {
+            document.getElementById('dashboard-main').style.display = 'none';
+            document.getElementById('users-section').style.display = 'none';
+            document.getElementById('providers-section').style.display = 'block';
+            loadProviders();
+            // Update active link
+            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+            document.querySelector('.sidebar-nav a[href="#"][onclick="showProviders()"]').classList.add('active');
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('../backend/get_all_users.php');
+                const data = await response.json();
+                const tbody = document.getElementById('users-tbody');
+                tbody.innerHTML = '';
+
+                if (data.users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4">No users found.</td></tr>';
+                    return;
+                }
+
+                data.users.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.phone_number}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        async function loadProviders() {
+            try {
+                const response = await fetch('../backend/get_all_providers.php');
+                const data = await response.json();
+                const tbody = document.getElementById('providers-tbody');
+                tbody.innerHTML = '';
+
+                if (data.providers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7">No providers found.</td></tr>';
+                    return;
+                }
+
+                data.providers.forEach(provider => {
+                    const availability = provider.availability ? 'Available' : 'Unavailable';
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${provider.id}</td>
+                        <td>${provider.name}</td>
+                        <td>${provider.email}</td>
+                        <td>${provider.business_name}</td>
+                        <td>${provider.business_phone}</td>
+                        <td>${provider.rating}</td>
+                        <td>${availability}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading providers:', error);
+            }
+        }
+
+        function logout() {
+            window.location.href = '../backend/logout.php';
+        }
+    </script>
+
+</body>
+
+</html>

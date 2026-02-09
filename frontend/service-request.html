@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Requests - On-Road Assist</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #f8fafc;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+            --success-color: #16a34a;
+            --danger-color: #dc2626;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-dark);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 280px;
+            background-color: var(--white);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo-icon { font-size: 1.5rem; }
+        .logo h2 { font-size: 1.1rem; font-weight: 700; }
+
+        .nav-menu {
+            list-style: none;
+            padding: 1rem 0;
+            flex: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .nav-link i { width: 20px; text-align: center; }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background-color: var(--secondary-color);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .emergency-section {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .service-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .service-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .service-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .requests-container {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .request-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .service-type {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-pending { background: #dbeafe; color: #1e40af; }
+        .status-accepted { background: #dcfce7; color: #166534; }
+        .status-in-progress { background: #fef3c7; color: #92400e; }
+        .status-completed { background: #d1fae5; color: #065f46; }
+
+        .request-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .request-details p {
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .request-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border-radius: 4px;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">
+            <span class="logo-icon">🚗</span>
+            <h2>On-Road Assist</h2>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard-vehicle-owner.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="my-vehicles.html" class="nav-link">
+                    <i class="fas fa-car"></i>
+                    My Vehicles
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="service-requests.html" class="nav-link active">
+                    <i class="fas fa-tools"></i>
+                    Service Requests
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="service-history.html" class="nav-link">
+                    <i class="fas fa-history"></i>
+                    Service History
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="profile.html" class="nav-link">
+                    <i class="fas fa-user"></i>
+                    Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../backend/logout.php" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <div class="header">
+            <h1><i class="fas fa-tools"></i> Service Requests</h1>
+            <a href="dashboard-vehicle-owner.html" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+
+        <div class="emergency-section">
+            <h2><i class="fas fa-exclamation-triangle"></i> Need Emergency Service?</h2>
+            <p>Quick access to emergency roadside assistance</p>
+            <div class="service-buttons">
+                <button class="service-btn" onclick="requestService('towing')">
+                    <i class="fas fa-truck"></i><br>Towing Service
+                </button>
+                <button class="service-btn" onclick="requestService('battery')">
+                    <i class="fas fa-car-battery"></i><br>Battery Jump
+                </button>
+                <button class="service-btn" onclick="requestService('tire')">
+                    <i class="fas fa-tire-pressure"></i><br>Tire Change
+                </button>
+                <button class="service-btn" onclick="requestService('fuel')">
+                    <i class="fas fa-gas-pump"></i><br>Fuel Delivery
+                </button>
+            </div>
+        </div>
+
+        <div class="requests-container">
+           
+        </div>
+    </div>
+    
+    </main>
+
+    <script>
+        function requestService(serviceType) {
+            const serviceNames = {
+                'towing': 'Towing Service',
+                'battery': 'Battery Jump',
+                'tire': 'Tire Change',
+                'fuel': 'Fuel Delivery'
+            };
+            
+            if (confirm(`Request ${serviceNames[serviceType]}? This will connect you with nearby service providers.`)) {
+                alert(`${serviceNames[serviceType]} request submitted! You will be contacted by a service provider soon.`);
+            }
+        }
+    </script>
+</body>
+</html>

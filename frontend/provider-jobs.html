@@ -1,0 +1,170 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'service_provider') {
+    header('Location: index.html');
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Jobs - Service Provider</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .header {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .back-btn {
+            background: #16a34a;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+        }
+        .jobs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        .job-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #16a34a;
+        }
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .job-type {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #16a34a;
+        }
+        .job-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status-completed { background: #dcfce7; color: #166534; }
+        .status-in-progress { background: #fef3c7; color: #92400e; }
+        .status-accepted { background: #dbeafe; color: #1e40af; }
+        .job-details p {
+            margin-bottom: 0.5rem;
+            color: #6b7280;
+        }
+        .no-jobs {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-briefcase"></i> My Jobs</h1>
+            <a href="dashboard-service-provider.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <div id="jobsContainer">
+            <div class="no-jobs">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p>Loading your jobs...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load and display jobs
+        function loadJobs() {
+            fetch('../backend/get_provider_jobs_today.php')
+            .then(response => response.json())
+            .then(data => {
+                displayJobs(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                displayJobs([]);
+            });
+        }
+
+        function displayJobs(jobs) {
+            const container = document.getElementById('jobsContainer');
+            
+            if (jobs.length === 0) {
+                container.innerHTML = `
+                    <div class="no-jobs">
+                        <i class="fas fa-briefcase fa-3x" style="color: #d1d5db; margin-bottom: 1rem;"></i>
+                        <h3>No jobs yet</h3>
+                        <p>Jobs you accept will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="jobs-grid">';
+            jobs.forEach(job => {
+                html += `
+                    <div class="job-card">
+                        <div class="job-header">
+                            <div class="job-type">${job.service_type}</div>
+                            <div class="job-status status-${job.status}">${job.status.toUpperCase()}</div>
+                        </div>
+                        <div class="job-details">
+                            <p><i class="fas fa-user"></i> <strong>Customer:</strong> ${job.customer_name || 'Unknown'}</p>
+                            <p><i class="fas fa-phone"></i> <strong>Phone:</strong> ${job.phone_number || 'N/A'}</p>
+                            <p><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> ${job.location}</p>
+                            <p><i class="fas fa-clock"></i> <strong>Date:</strong> ${new Date(job.request_time).toLocaleDateString()}</p>
+                            ${job.completed_time ? `<p><i class="fas fa-check"></i> <strong>Completed:</strong> ${new Date(job.completed_time).toLocaleDateString()}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Load jobs when page loads
+        document.addEventListener('DOMContentLoaded', loadJobs);
+    </script>
+</body>
+</html>
